@@ -1,0 +1,20 @@
+[package]
+name = "libpcap"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+description="Rust libpcap"
+readme = "README.md"
+homepage = "https://github.com/asmcos/libpcap"
+repository = "https://github.com/asmcos/libpcap"
+documentation = "https://github.com/asmcos/libpcap/doc"
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libc = "0.2"
+
+[lib]
+name = "libpcap"
+
