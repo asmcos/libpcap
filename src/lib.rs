@@ -3,24 +3,29 @@
 
 
 use std::ffi::{self, CStr, CString};
-use libc::{c_char};
+use libc::{c_char,c_uchar};
 use std::ptr;
 use std::time;
 
 mod clib;
 
-use clib::{pcap_t};
+use clib::{pcap_t,pcap_pkthdr};
 
-pub struct Handle {
+pub struct Packet {
     handle: *mut pcap_t,
+    header: pcap_pkthdr,
+    data: *const u8,
 }
 
-impl Handle {
-    fn new(handle: *mut pcap_t) -> Handle {
-        Handle { handle }
+impl Packet {
+    fn new(handle: *mut pcap_t) -> Packet {
+        Packet { 
+            handle: handle,
+            header: make_pkthdr(),
+            data: ptr::null() ,
+         }
     }
 }
-
 
 
 #[inline]
@@ -29,20 +34,21 @@ unsafe fn cstr_to_string(ptr: *const libc::c_char) -> String {
     CStr::from_ptr(ptr as _).to_str().unwrap().to_owned()
 }
 
-pub fn make_timeval(duration: time::Duration) -> libc::timeval {
-    libc::timeval {
-        tv_sec: duration.as_secs() as i64,
-        tv_usec: duration.subsec_micros() as libc::suseconds_t,
+pub fn make_pkthdr( ) -> clib::pcap_pkthdr {
+
+    let duration = time::Duration::new(10,0);
+
+    clib::pcap_pkthdr{
+        ts:
+            libc::timeval {
+            tv_sec: duration.as_secs() as i64,
+            tv_usec: duration.subsec_micros() as libc::suseconds_t,
+            },
+        caplen : 0,
+        len :0,
     }
 }
 
-impl clib::pcap_pkthdr{
-	fn new(){
-
-		let ts = make_timeval(time::Duration::new(10, 0));
-
-	}
-}
 
 
 pub fn lookup( ) -> String{
@@ -57,7 +63,7 @@ pub fn lookup( ) -> String{
 }
 
 
-pub fn pcap_open(interface_name: &str)->Result<Handle,bool>{
+pub fn open(interface_name: &str)->Result<Packet,bool>{
 
 	let snaplen :i32 = 5000;
 	let promisc   = true;
@@ -73,7 +79,7 @@ pub fn open_live(
     snaplen: i32,
     promisc: bool,
     read_timeout_ms: i32,
-    ) -> Result<Handle, bool> {
+    ) -> Result<Packet, bool> {
 
 	let interface_name = CString::new(interface_name).unwrap();
     let mut err_buf = [0i8; 256];
@@ -89,18 +95,37 @@ pub fn open_live(
     if handle.is_null() {
 		Err(false)
     } else {
-        Ok(Handle::new(handle))
+        Ok(Packet::new(handle))
     }
 
 }
 
-pub fn next(h:Handle){
+pub fn next(p:&mut Packet)-> *const libc::c_uchar{
 
-	let mut header: *mut clib::pcap_pkthdr = ptr::null_mut();
-    let mut data: *const libc::c_uchar = ptr::null();
+    let mut header = &mut p.header;
 
-	data = unsafe {
-		let d = clib::pcap_next(h.handle ,header);
+	let data = unsafe {
+
+        let d = clib::pcap_next((*p).handle,&mut *header);
+
+        println!("{:?},{:?}",header.len,header.caplen);
+
 		d
-	}
+	};
+    data
+}
+
+pub fn next_ex(p:&mut Packet)->i32{
+        
+    let mut header: *mut clib::pcap_pkthdr = ptr::null_mut();
+    let mut data: *const libc::c_uchar = ptr::null();
+    
+    let data = unsafe {
+
+        
+        let d = clib::pcap_next_ex((*p).handle ,&mut header,&mut (*p).data);
+        println!("{:?},{:?},{:?}",d,(*header).len,(*header).caplen);
+        d
+    };
+    data
 }
