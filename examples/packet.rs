@@ -5,14 +5,16 @@ fn main() -> Result<(),bool> {
 	println!("Found net device: {}",dev);
 
 	let mut Packet = libpcap::open(dev.as_str())?;
-    
-    
-    while let data = libpcap::next(&mut Packet){
-        println!("{:?}",data);
-    }
+   
+unsafe { 
     /*
-    while let data = libpcap::next_ex(&mut Packet){
-        println!("{:?}",data);
+    while let data = libpcap::next(&mut Packet){
+        println!("{:?}",(*Packet.header).len);
     }*/
+     
+    while let data = libpcap::next_ex(&mut Packet){
+        println!("{:?}",(*Packet.header).len);
+    }
+}
     Ok(())
 }
