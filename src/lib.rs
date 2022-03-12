@@ -12,17 +12,20 @@ mod clib;
 use clib::{pcap_t,pcap_pkthdr};
 
 pub struct Packet {
-    handle: *mut pcap_t,
-    header: pcap_pkthdr,
-    data: *const u8,
+    pub handle: *mut pcap_t,
+    pub header: *mut pcap_pkthdr,
+    pub data: *const u8,
+    pub head: pcap_pkthdr,
 }
 
 impl Packet {
     fn new(handle: *mut pcap_t) -> Packet {
+        let mut head = make_pkthdr();
         Packet { 
             handle: handle,
-            header: make_pkthdr(),
+            header: &mut head,
             data: ptr::null() ,
+            head: head,
          }
     }
 }
@@ -102,7 +105,7 @@ pub fn open_live(
 
 pub fn next(p:&mut Packet)-> *const libc::c_uchar{
 
-    let mut header = &mut p.header;
+    let mut header = &mut p.head;
 
 	let data = unsafe {
 
@@ -124,6 +127,7 @@ pub fn next_ex(p:&mut Packet)->i32{
 
         
         let d = clib::pcap_next_ex((*p).handle ,&mut header,&mut (*p).data);
+        (*p).header = header;
         println!("{:?},{:?},{:?}",d,(*header).len,(*header).caplen);
         d
     };
