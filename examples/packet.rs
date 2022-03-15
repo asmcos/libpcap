@@ -13,7 +13,7 @@ unsafe {
     }*/
      
     while let data = libpcap::next_ex(&mut Packet){
-        println!("{:?}",(*Packet.header).len);
+        println!("{:?}",Packet);
     }
 }
     Ok(())

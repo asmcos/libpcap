@@ -6,7 +6,7 @@ use std::ffi::{self, CStr, CString};
 use libc::{c_char,c_uchar};
 use std::ptr;
 use std::time;
-
+use std::fmt;
 mod clib;
 
 use clib::{pcap_t,pcap_pkthdr};
@@ -32,6 +32,18 @@ impl Packet {
     }
 }
 
+impl fmt::Debug for Packet{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+	  let r = unsafe{
+        write!(
+            f,
+            "Packet {{ ts: {}.{:06}, caplen: {}, len: {} }}",
+            (*self.header).ts.tv_sec, (*self.header).ts.tv_usec, (*self.header).caplen, (*self.header).len
+        )
+	 };//unsafe
+	 r
+    }
+}
 
 #[inline]
 unsafe fn cstr_to_string(ptr: *const libc::c_char) -> String {
