@@ -13,9 +13,8 @@ use clib::{pcap_t,pcap_pkthdr};
 
 pub struct Packet {
     pub handle: *mut pcap_t,
-    pub header: *const pcap_pkthdr,
-    pub data: *const u8,
     pub head: pcap_pkthdr,
+    pub data: *const u8,
 }
 
 impl Packet {
@@ -23,25 +22,20 @@ impl Packet {
         let mut head = make_pkthdr();
         let mut p = Packet { 
             handle: handle,
-            header: ptr::null(),
+            head: head, 
             data: ptr::null() ,
-            head: head, //this is a clone
          };
-        p.header = &p.head;
         p
     }
 }
 
 impl fmt::Debug for Packet{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-	  let r = unsafe{
         write!(
             f,
             "Packet {{ ts: {}.{:06}, caplen: {}, len: {} }}",
-            (*self.header).ts.tv_sec, (*self.header).ts.tv_usec, (*self.header).caplen, (*self.header).len
+            self.head.ts.tv_sec, self.head.ts.tv_usec, self.head.caplen, self.head.len
         )
-	 };//unsafe
-	 r
     }
 }
 
@@ -124,9 +118,6 @@ pub fn next(p:&mut Packet)-> *const libc::c_uchar{
 
         let d = clib::pcap_next((*p).handle,&mut p.head);
         p.data = d;
-        p.header = &p.head;
-        //println!("{:?},{:?}",(*p.header).len,(*p.header).caplen);
-
 		d
 	};
     data
@@ -141,10 +132,9 @@ pub fn next_ex(p:&mut Packet)->i32{
 
         
         let d = clib::pcap_next_ex((*p).handle ,&mut header,&mut (*p).data);
-        (*p).header = header;
-        
-        //println!("{:?},{:?},{:?}",d,(*header).len,(*header).caplen);
+        p.head = *header;
         d
     };
     data
 }
+
