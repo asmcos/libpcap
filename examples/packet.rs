@@ -1,10 +1,10 @@
 
 fn main() -> Result<(),bool> {
 
-	let dev = libpcap::lookup();
-	println!("Found net device: {}",dev);
+    let dev = libpcap::lookup();
+    println!("Found net device: {}",dev);
 
-	let mut Packet = libpcap::open(dev.as_str())?;
+    let mut Packet = libpcap::open(dev.as_str())?;
    
      
     while let data = libpcap::next(&mut Packet){

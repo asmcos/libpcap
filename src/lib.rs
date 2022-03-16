@@ -36,7 +36,7 @@ impl fmt::Debug for Packet{
             "Packet {{ ts: {}.{:06}, caplen: {}, len: {} }}",
             self.head.ts.tv_sec, self.head.ts.tv_usec, self.head.caplen, self.head.len
         );
-		println!("Data  {:?},Length {:?}",self.data,self.head.len);
+        println!("Data  {:?},Length {:?}",self.data,self.head.len);
 	unsafe {
 		for i in 0..self.head.len{
 			let a = self.data.offset(i as isize);
@@ -101,7 +101,7 @@ pub fn open_live(
     read_timeout_ms: i32,
     ) -> Result<Packet, bool> {
 
-	let interface_name = CString::new(interface_name).unwrap();
+    let interface_name = CString::new(interface_name).unwrap();
     let mut err_buf = [0i8; 256];
     let handle = unsafe {
         clib::pcap_open_live(
@@ -123,12 +123,12 @@ pub fn open_live(
 pub fn next(p:&mut Packet)-> *const libc::c_uchar{
 
 
-	let data = unsafe {
+    let data = unsafe {
 
         let d = clib::pcap_next((*p).handle,&mut p.head);
         p.data = d;
-		d
-	};
+        d
+    };
     data
 }
 
