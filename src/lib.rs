@@ -31,11 +31,20 @@ impl Packet {
 
 impl fmt::Debug for Packet{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
+        let ret = write!(
             f,
             "Packet {{ ts: {}.{:06}, caplen: {}, len: {} }}",
             self.head.ts.tv_sec, self.head.ts.tv_usec, self.head.caplen, self.head.len
-        )
+        );
+		println!("Data  {:?},Length {:?}",self.data,self.head.len);
+	unsafe {
+		for i in 0..self.head.len{
+			let a = self.data.offset(i as isize);
+			print!("0x{:02x}, ",*a);		
+		}
+	}
+		println!();
+		ret
     }
 }
 
