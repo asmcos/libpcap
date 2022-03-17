@@ -83,6 +83,32 @@ pub fn lookup( ) -> String{
 }
 
 
+pub fn findalldevs() -> Vec<String> {
+
+        let mut errbuf = [0i8; 256];
+        let devices = unsafe {
+            let mut dev_buf: *mut clib::pcap_if_t = ptr::null_mut();
+            if clib::pcap_findalldevs(&mut dev_buf, errbuf.as_mut_ptr()) != 0 {
+                panic!("Not Find any devices!");
+            }
+
+           let mut devices = vec![];
+            let mut cur = dev_buf;
+            while !cur.is_null() {
+                let dev = &*cur;
+                let name = cstr_to_string(dev.name);                 
+                devices.push(name);
+
+                cur = dev.next;
+            }
+            clib::pcap_freealldevs(dev_buf);
+            devices
+        };
+        devices
+
+}
+
+
 pub fn open(interface_name: &str)->Packet{
 
 	let snaplen :i32 = 5000;
