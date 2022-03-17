@@ -19,4 +19,5 @@ fn main() {
         println!("{:?},{:?}",Packet.data,Packet.head.len);
     }*/
 
+    libpcap::close(&mut Packet);
 }

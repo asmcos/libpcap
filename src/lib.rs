@@ -93,6 +93,11 @@ pub fn open(interface_name: &str)->Packet{
 
 }
 
+pub fn close(p:&mut Packet){
+    unsafe {
+        clib::pcap_close((*p).handle);
+    }
+}
 
 pub fn open_live(
     interface_name: &str,
