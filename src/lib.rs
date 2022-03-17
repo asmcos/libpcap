@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 #![allow(warnings, unused)]
-
+#![allow(dead_code)]
 
 use std::ffi::{self, CStr, CString};
 use libc::{c_char,c_uchar};
@@ -83,13 +83,13 @@ pub fn lookup( ) -> String{
 }
 
 
-pub fn open(interface_name: &str)->Result<Packet,bool>{
+pub fn open(interface_name: &str)->Packet{
 
 	let snaplen :i32 = 5000;
 	let promisc   = true;
 	let read_timeout_ms :i32 = 2000;
 
-	open_live(interface_name,snaplen,promisc,read_timeout_ms)
+	open_live(interface_name,snaplen,promisc,read_timeout_ms).unwrap()
 
 }
 

@@ -1,10 +1,13 @@
+#![allow(dead_code)]
+#![allow(non_camel_case_types)]
+#![allow(warnings, unused)]
 
-fn main() -> Result<(),bool> {
+fn main() {
 
     let dev = libpcap::lookup();
     println!("Found net device: {}",dev);
 
-    let mut Packet = libpcap::open(dev.as_str())?;
+    let mut Packet = libpcap::open(dev.as_str());
    
      
     while let data = libpcap::next(&mut Packet){
@@ -16,5 +19,4 @@ fn main() -> Result<(),bool> {
         println!("{:?},{:?}",Packet.data,Packet.head.len);
     }*/
 
-    Ok(())
 }
