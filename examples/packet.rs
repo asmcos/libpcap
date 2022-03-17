@@ -7,9 +7,6 @@ fn main() {
     let dev = libpcap::lookup();
     println!("Found net device: {}",dev);
 
-    let devices = libpcap::findalldevs();
-    println!("{:?}",devices);
-
     let mut Packet = libpcap::open(dev.as_str());
    
      
@@ -17,7 +14,7 @@ fn main() {
         println!("{:?}",Packet);
     }
     
-	/*
+	/* 
     while let data = libpcap::next_ex(&mut Packet){
         println!("{:?},{:?}",Packet.data,Packet.head.len);
     }*/
