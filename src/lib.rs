@@ -7,6 +7,7 @@ use libc::{c_char,c_uchar};
 use std::ptr;
 use std::time;
 use std::fmt;
+use std::mem;
 mod clib;
 
 use clib::{pcap_t,pcap_pkthdr};
@@ -108,6 +109,26 @@ pub fn findalldevs() -> Vec<String> {
 
 }
 
+pub fn setfilter(p:&mut Packet,s:&str){
+    let program = CString::new(s).unwrap();
+    unsafe {
+        let mut bpf_program: clib::bpf_program = mem::zeroed();
+        let ret = clib::pcap_compile(
+            (*p).handle,
+            &mut bpf_program,
+            program.as_ptr(),
+            1,
+            0,
+        );
+        if (ret == -1){
+            println!("Set filter Failed!");
+        }
+        let ret = clib::pcap_setfilter((*p).handle, &mut bpf_program);
+        clib::pcap_freecode(&mut bpf_program);
+         
+    }
+
+}
 
 pub fn open(interface_name: &str)->Packet{
 
