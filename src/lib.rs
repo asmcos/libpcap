@@ -3,7 +3,7 @@
 #![allow(dead_code)]
 
 use std::ffi::{self, CStr, CString};
-use libc::{c_char,c_uchar};
+use libc::{c_char,c_uchar,c_int,c_uint};
 use std::ptr;
 use std::time;
 use std::fmt;
@@ -81,6 +81,22 @@ pub fn lookup( ) -> String{
 	};
 
 	devs	
+}
+
+pub fn lookupnet(interface_name: &str,netp:&mut c_uint,maskp:&mut c_uint)->c_int{
+ 
+    let mut errbuf = [0i8; 256];
+    let interface_name = CString::new(interface_name).unwrap();
+
+    let ret = unsafe{
+
+        let ret = clib::pcap_lookupnet(interface_name.as_ptr(), netp, maskp, errbuf.as_mut_ptr());
+        if (ret == -1){
+            println!("{:?}",errbuf);
+        }
+        ret
+    };
+    ret 
 }
 
 
