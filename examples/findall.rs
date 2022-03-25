@@ -18,8 +18,9 @@ fn main() {
         println!("IP:{:?}\nmask:{:?}",IpAddr::V4(u32::from_be(netp).into()),IpAddr::V4(u32::from_be(maskp).into()));
     } 
 
-    let mut Packet = libpcap::open(devices[0].as_str());
-   
+    //let mut Packet = libpcap::open(devices[0].as_str());
+
+    let mut Packet = libpcap::create(devices[0].as_str());
 	
     while let data = libpcap::next_ex(&mut Packet){
         println!("{:?},{:?}",Packet.data,Packet.head.len);

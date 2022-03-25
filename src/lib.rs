@@ -188,6 +188,29 @@ pub fn open_live(
 
 }
 
+
+pub fn create(interface_name:&str) ->Packet{
+
+
+    let mut err_buf = [0i8; 256];
+    let interface_name = CString::new(interface_name).unwrap();
+    let handle = unsafe {
+        let handle1 = clib::pcap_create(interface_name.as_ptr(),err_buf.as_mut_ptr());
+        if handle1.is_null(){
+            panic!("Open device error;");
+        }
+
+        let ret = clib::pcap_activate(handle1);
+        if (ret < 0){
+            panic!("Activate device error!");
+        }
+        handle1
+    };
+
+    Packet::new(handle)
+}
+
+
 pub fn next(p:&mut Packet)-> *const libc::c_uchar{
 
 
